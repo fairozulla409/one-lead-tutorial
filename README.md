@@ -1,5 +1,5 @@
-oneLead.app
-===========
+Lightning-to-Lead tutorial
+==========================
 
 Simple tutorial for Lightning on the Salesforce1 Platform that teaches a few core concepts:
 
