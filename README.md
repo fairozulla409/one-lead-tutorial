@@ -71,3 +71,34 @@ save : function(component, event, helper) {
     alert('save action invoked');
 }
 ```
+
+### Bind inputs to a new sObject instance
+
+Let's put the input elements to work! Knowing that our end goal is to fill in the data for a new Lead record, it would make sense to set up a shell of the Lead record and simply have the input elements fill in the Lead fields directly.
+
+The first step is to create a place where values can be stored, and with Lightning those places are defined in a component using `aura:attribute` tags.
+
+```aura
+<aura:application>
+    <aura:attribute name="lead" type="Lead"
+                    default="{
+                        'sobjectType': 'Lead',
+                        'FirstName': 'John',
+                        'LastName': 'Doe',
+                        'Company': 'Doe Industries, LLC'
+                    }"/>
+...
+```
+
+It's important to note that **you must explicitly define default values** for all fields to which you are going to bind inputs. Otherwise you'll get [null pointer errors](http://salesforce.stackexchange.com/questions/54821/elegant-initialization-of-lightning-auraattribute).
+
+Then, with the sObject variable effectively defined, now you can bind your inputs by simply adding a `value` attribute to each `ui:inputText` (or equivalent).
+
+```aura
+<aura:inputText aura:id="lastName"
+                label="Last Name"
+                value="{!v.lead.LastName}"
+                required="true"/>
+```
+
+Note the use of the "v." prefix when addressing the newly defined `lead` aura:attribute in the Lightning expression. Think of "v." as being a prefix that refers to things in the "view", meaning that they're things that are _not_ defined in the controller.
