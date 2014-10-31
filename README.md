@@ -142,3 +142,44 @@ As you can see, all this action does is insert the Lead record into the database
 
 Let's take a second to talk about this _second_ controller that we've now added to the mix. Remember that we already have a Lightning controller, defined completely in JavaScript? Well, it's probably more helpful for you to think of the Lightning controller and the Apex controller as _one_ controller, created by merging the two together. While you don't need to worry about the black magic that makes this work, you _should_ remember that because the two controllers are merged together, **the action names share the same namespace**. If you define an action called `createTask` in your Lightning controller, and you define an action called `createTask` in your Apex controller, Salesforce will not scream at you, but your app _will not work_ as expected.
 
+### Last step, invoking the Apex controller action
+
+All you need to do now is configure the `save` action to invoke the `createLead` action, passing the `lead` aura:attribute to the action as a parameter. This is all done inside the Lightning controller's definition of the `save` action. So update it to look like the following.
+
+```javascript
+save : function(component, event, helper) {
+    
+    // Get the RawMapValue object that will
+    // be passed to the Apex controller action
+    // as a Lead object
+    var theLead = component.get("v.lead");
+    
+    // Get the Action object that represents
+    // the equivalent Apex controller action
+    // (i.e., @AuraEnabled static method)
+    var action = component.get("c.createLead");
+    
+    // Specify the required parameters, as defined
+    // in the Apex method's signature
+    action.setParams({
+        "theLead": theLead
+    });
+    
+    // Since the Apex method returns an ID value,
+    // simply display the returned value in an alert
+    // to confirm that the controller action
+    // executed successfully
+    action.setCallback(component, function(a) {
+        alert(a.getReturnValue());
+    });
+    
+    // Queue up the action to be executed asynchronously
+    $A.enqueueAction(action);
+}
+```
+
+Try your app again. You should now be able to create new Lead records!
+
+The final thing to point out before calling it a day is the **asynchronous** nature of Lightning. Actions are always _queued_ up to be executed, meaning that you can't explicitly expect actions to execute in a specific sequence. Also, because actions are executed asynchronously, you always need to handle the return values using a callback function, specified using the `Action.setCallback()` instance function.
+
+Now that hopefully you've been acquainted with the basic concepts, move on to building the [expense tracker app](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/qs_intro.htm)!
