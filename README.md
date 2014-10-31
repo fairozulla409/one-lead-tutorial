@@ -102,3 +102,16 @@ Then, with the sObject variable effectively defined, now you can bind your input
 ```
 
 Note the use of the "v." prefix when addressing the newly defined `lead` aura:attribute in the Lightning expression. Think of "v." as being a prefix that refers to things in the "view", meaning that they're things that are _not_ defined in the controller.
+
+### Reference the aura:attribute in the Lightning controller
+
+To reference the attribute in the Lightning controller, all you need to do is invoke the `get(String)` instance method for the component. Update the `save` action to display the lead's Last Name.
+
+```javascript
+save : function(component, event, helper) {
+    var theLead = component.get("v.lead");
+    alert(theLead.LastName);
+}
+```
+
+Again, note the use of the "v." prefix to grab the lead aura:attribute that was defined in the _view_. Try updating the preview for your app, and you should now get an alert pop-up that tells the Last Name entered for the lead.
