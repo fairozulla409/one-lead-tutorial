@@ -115,3 +115,30 @@ save : function(component, event, helper) {
 ```
 
 Again, note the use of the "v." prefix to grab the lead aura:attribute that was defined in the _view_. Try updating the preview for your app, and you should now get an alert pop-up that tells the Last Name entered for the lead.
+
+### Create an Apex controller to perform DML operations
+
+Similarly to Visualforce, Lightning is able to leverage Apex to quickly connect your app to your data in Salesforce. All you have to do is expose methods in an Apex **controller** class as Lightning actions by using the `@AuraEnabled` annotation. Let's define the `createLead` action that we'll use to actually create the Lead record within Salesforce.
+
+Create a new Apex class called OneLeadController that just has the single `createLead()` method shown below.
+
+```apex
+public class OneLeadController {
+
+    @AuraEnabled
+    public static Id createLead(Lead theLead) {
+        insert theLead;
+        return theLead.Id;
+    }
+}
+```
+
+As you can see, all this action does is insert the Lead record into the database, and then return the Lead ID of the new record as confirmation that the DML operation succeeded. But before we can actually use this action we need to associate this new controller with the Lightning app, by specifying the `controller` attribute in our aura:application tag.
+
+```aura
+<aura:application controller="OneLeadController">
+...
+```
+
+Let's take a second to talk about this _second_ controller that we've now added to the mix. Remember that we already have a Lightning controller, defined completely in JavaScript? Well, it's probably more helpful for you to think of the Lightning controller and the Apex controller as _one_ controller, created by merging the two together. While you don't need to worry about the black magic that makes this work, you _should_ remember that because the two controllers are merged together, **the action names share the same namespace**. If you define an action called `createTask` in your Lightning controller, and you define an action called `createTask` in your Apex controller, Salesforce will not scream at you, but your app _will not work_ as expected.
+
